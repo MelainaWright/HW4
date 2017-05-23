@@ -1,0 +1,108 @@
+---
+title: "HW4"
+author: "MelainaWright"
+date: "May 23, 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r loadpackage, results='hide', message=FALSE}
+
+# Write a function that takes as input
+# * a table that has prices for different fish
+# * a table that has the number caught for each fish species for each location
+# * each location is in a different column
+# * each fish is in a different row
+# Function output will be
+# * most frequently caught fish in each location
+# * total revenue for each location
+# * total fisheries sum
+# * if user requests it graph revenue by location and add total to the plot
+# * Store your function in an *.R file
+# * Generate some example data for your function; and show how this is created and used in an R markdown document
+# * Submit as usual as a git link on gauchospace
+
+library(ggplot2)
+
+```
+
+
+
+```{r Import, echo=TRUE, eval=TRUE}
+
+fishprice=read.csv("fishprice.csv", stringsAsFactors = FALSE)
+
+#     species price
+# 1     shark    10
+# 2      tuna    20
+# 3 swordfish    30
+
+
+fishnumber=read.csv("fishnumber.csv", stringsAsFactors = FALSE)
+
+#    species A B C
+# 1     shark 5 1 3
+# 2      tuna 1 3 5
+# 3 swordfish 2 2 6
+
+
+fisheries_summary = function(fishprice, fishnumber, graph="true") {
+
+  # * most frequently caught fish in each location
+  for(colName in names(fishnumber)){
+    if(colName!="species"){
+      maxCount = max(fishnumber[[colName]])
+      maxFish = fishnumber$species[fishnumber[[colName]] == maxCount]
+      cat("Location: ", colName,"\t maxFish: ", maxFish, "\n")
+    }
+  }
+  
+  # * total revenue for each location
+  totalRevenueByLocation = c()
+  for(colName in names(fishnumber)){
+    if(colName !="species"){
+      currentFishRevenue = 0
+      for(species in fishnumber$species){
+        price = fishprice$price[fishnumber$species==species]
+        amount = fishnumber[[colName]][fishnumber$species==species]
+        currentFishRevenue = currentFishRevenue + price*amount
+      }
+      cat("Location: ", colName, "\t currentFishRevenue: ", currentFishRevenue, "\n")
+      totalRevenueByLocation = c(totalRevenueByLocation,currentFishRevenue)
+    }
+  }
+  locs = names(fishnumber)
+  locs = locs[-1]
+  TotalRevenueByLocationDF = data.frame(Location=locs,totalRevenueByLocation, stringsAsFactors = FALSE)
+
+  
+  
+# * total fisheries sum
+TotalFisheriesSum = sum(TotalRevenueByLocationDF$totalRevenueByLocation)
+TotalFisheriesSumDF = c(Location="Total", TotalFisheriesSum, stringsAsFactors = FALSE)
+
+RevenueDF = rbind(TotalRevenueByLocationDF, TotalFisheriesSumDF)
+
+
+
+# * if user requests it graph revenue by location and add total to the plot
+
+  if(graph=="true"){
+    RevenueGraph = ggplot(RevenueDF, aes(x=as.factor(Location), y=totalRevenueByLocation)) +
+    geom_bar(stat = "identity") +
+    labs(x="Location", y="Total Revenue") +
+    ggtitle("Fisheries Revenue by Location")
+    RevenueGraph
+    
+  }
+
+}#end of function
+
+
+```
+
