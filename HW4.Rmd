@@ -10,34 +10,19 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-
 ```{r loadpackage, results='hide', message=FALSE}
-
-# Write a function that takes as input
-# * a table that has prices for different fish
-# * a table that has the number caught for each fish species for each location
-# * each location is in a different column
-# * each fish is in a different row
-# Function output will be
-# * most frequently caught fish in each location
-# * total revenue for each location
-# * total fisheries sum
-# * if user requests it graph revenue by location and add total to the plot
-# * Store your function in an *.R file
-# * Generate some example data for your function; and show how this is created and used in an R markdown document
-# * Submit as usual as a git link on gauchospace
 
 library(ggplot2)
 
 ```
 
-
-
+#Data
 ```{r Import, echo=TRUE, eval=TRUE}
 
 fishprice=read.csv("fishprice.csv", stringsAsFactors = FALSE)
 
-#     species price
+#what the data looks like:
+#     species  price
 # 1     shark    10
 # 2      tuna    20
 # 3 swordfish    30
@@ -45,11 +30,16 @@ fishprice=read.csv("fishprice.csv", stringsAsFactors = FALSE)
 
 fishnumber=read.csv("fishnumber.csv", stringsAsFactors = FALSE)
 
-#    species A B C
+#what data looks like:
+#    species  A B C
 # 1     shark 5 1 3
 # 2      tuna 1 3 5
 # 3 swordfish 2 2 6
+```
 
+
+#Function
+```{r Function, echo=TRUE, eval=TRUE} 
 
 fisheries_summary = function(fishprice, fishnumber, graph="true") {
 
@@ -61,6 +51,7 @@ fisheries_summary = function(fishprice, fishnumber, graph="true") {
       cat("Location: ", colName,"\t maxFish: ", maxFish, "\n")
     }
   }
+  
   
   # * total revenue for each location
   totalRevenueByLocation = c()
@@ -89,9 +80,7 @@ TotalFisheriesSumDF = c(Location="Total", TotalFisheriesSum, stringsAsFactors = 
 RevenueDF = rbind(TotalRevenueByLocationDF, TotalFisheriesSumDF)
 
 
-
 # * if user requests it graph revenue by location and add total to the plot
-
   if(graph=="true"){
     RevenueGraph = ggplot(RevenueDF, aes(x=as.factor(Location), y=totalRevenueByLocation)) +
     geom_bar(stat = "identity") +
@@ -103,6 +92,12 @@ RevenueDF = rbind(TotalRevenueByLocationDF, TotalFisheriesSumDF)
 
 }#end of function
 
-
 ```
 
+
+#Example
+```{r Example, echo=TRUE, eval=TRUE} 
+
+fisheries_summary(fishprice=fishprice, fishnumber=fishnumber, graph="true")
+
+```
